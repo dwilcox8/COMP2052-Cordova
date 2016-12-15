@@ -11,3 +11,5 @@ All code is written in the `www/index.html` file and this project includes three
 * cordova-plugin-whitelist - so Cordova can be used through Android's WebView widget
 
 I have also included the apk (current build) to test and play with.
+
+The APK file is under `platforms/android/build/outputs/apk`.
