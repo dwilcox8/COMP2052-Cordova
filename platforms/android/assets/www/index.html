@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <title>Acceleration Example</title>
+    <script type="text/javascript">
+
+    // The watch id references the current `watchAcceleration`
+    var watchID = null;
+    var canvas = null;
+    var xPos = 0;
+    var yPos = 0;
+    var target = null;
+    var cnv = null;
+    
+    var iW = window.innerWidth;
+    var iH = window.innerHeight;
+
+    // Wait for device API libraries to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // device APIs are available
+    function onDeviceReady() {
+		screen.lockOrientation('portrait');
+        startWatch();
+    }
+
+    // Start watching the acceleration
+    function startWatch() {
+
+        canvas = document.getElementById('myCanvas');
+        cnv = canvas.getContext("2d");
+        cnv.canvas.width = iW;
+        cnv.canvas.height = iH - 40;
+
+        // I used an image instead, as it was easier to draw
+        target = new Image();
+        target.src = "img/blue-ball.png";
+        xPos = (iW-target.width)/2;
+        yPos = (iH-target.height)/2;
+        target.onload = function() {
+            cnv.drawImage(target, xPos, yPos);
+        }
+
+        // Update acceleration every 0.3 seconds
+        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, { frequency: 25 });
+    }
+
+    // Stop watching the acceleration
+    //
+    function stopWatch() {
+        if (watchID) {
+            navigator.accelerometer.clearWatch(watchID);
+            watchID = null;
+        }
+    }
+
+    // onSuccess: Get a snapshot of the current acceleration
+    //
+    function onSuccess(acceleration) {
+
+        cnv.clearRect(0, 0, canvas.width, canvas.height);
+          
+        //make the ball move twice as fast
+        xPos += -1*(acceleration.x *2);
+        yPos += (acceleration.y *2); 
+
+
+        //edge cases
+        if (xPos < 0)  { xPos = 0;  }
+
+        if (xPos >= (cnv.canvas.width)-40){
+            xPos = (cnv.canvas.width)-40;
+        }
+        
+
+        if (yPos < 0)  { yPos = 0;  }
+
+        //icon size + h1 height
+        if (yPos >= (cnv.canvas.height)-60){
+            yPos = (cnv.canvas.height)-60;
+        }
+        
+        cnv.drawImage(target, xPos, yPos);
+
+    }
+
+    // onError: Failed to get the acceleration
+    function onError() {
+        alert('onError!');
+    }
+
+    </script>
+
+    <style>
+    body {
+        margin: 0px;
+    }
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+    }
+
+    #footerTable {
+        width: 100%;
+    }
+    footer {
+        position:absolute;
+        bottom:0;
+        width:100%;
+        height:40px;
+        background:#ccc;
+    }
+    h1 {
+        border-bottom: 1px solid gray;
+        margin-bottom: 0px;
+        padding-left: 10px;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Accelerometer</h1>
+    <canvas id="myCanvas"></canvas>    
+  </body>
+</html>
